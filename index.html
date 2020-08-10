@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+    
+<title>在线二维码解析</title>
+    
+<script src="jquery.min.js"></script>
+    
+<script src="reqrcode.js"></script>
+
+</head>
+
+
+<body>
+    
+<div id="qr"></div>
+<input type="file" id="newfile">
+
+</body>
+
+
+<script>
+
+var Base64 = {
+    encode(str) {
+        // first we use encodeURIComponent to get percent-encoded UTF-8,
+        // then we convert the percent encodings into raw bytes which
+        // can be fed into btoa.
+        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+            function toSolidBytes(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
+    },
+    decode(str) {
+        // Going backwards: from bytestream, to percent-encoding, to original string.
+        return decodeURIComponent(atob(str).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    }
+};
+    
+var newfile = document.getElementById('newfile');
+    
+var getObjectURL = function (file) {
+        
+var url = null;
+        
+if (window.createObjectURL != undefined) {      
+url = window.createObjectURL(file);
+        
+}
+else 
+if (window.URL != undefined) 
+{  
+url = window.URL.createObjectURL(file);
+        
+} 
+else 
+if (window.webkitURL != undefined) {      
+url = window.webkitURL.createObjectURL(file);
+        
+}
+        
+return url;
+    
+}    
+newfile.onchange = function () {
+        
+//   console.log(newfile[0]);
+        
+console.log(getObjectURL(this.files[0]));// newfile[0]是通过input file上传的二维码图片文件
+        
+qrcode.decode(getObjectURL(this.files[0]));
+        
+qrcode.callback = function (imgMsg) {
+            
+//alert("二维码解析：" + imgMsg);
+imgMsg=imgMsg.split("tao6.top://")[1];
+qr.innerText="二维码解析：" + Base64.decode(imgMsg);
+}
+}
+
+</script>
+
+
+</html>
